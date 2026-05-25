@@ -6,32 +6,48 @@ import '../models/user.dart';
 import '../models/quest.dart';
 import '../models/workout_log.dart';
 import '../models/diet_log.dart';
+import '../models/achievement.dart';
 
 class QuestLogProvider with ChangeNotifier {
   // Gunakan IP 10.0.2.2 untuk Android Emulator, localhost untuk Desktop/Web
   // Kita buat deteksi otomatis sederhana
-  String _baseUrl = 'http://localhost:8080/api';
+  String _baseUrl = 'http://localhost:8080/api/v1';
   
   User? _currentUser;
+  String? _token;
   List<Quest> _dailyQuests = [];
   List<WorkoutLog> _dailyWorkouts = [];
   List<DietLog> _dailyDiet = [];
   List<User> _leaderboard = [];
+  List<Achievement> _achievements = [];
   bool _isLoading = false;
   String? _errorMessage;
 
   // Getters
   User? get currentUser => _currentUser;
+  String? get token => _token;
   List<Quest> get dailyQuests => _dailyQuests;
   List<WorkoutLog> get dailyWorkouts => _dailyWorkouts;
   List<DietLog> get dailyDiet => _dailyDiet;
   List<User> get leaderboard => _leaderboard;
+  List<Achievement> get achievements => _achievements;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
   void setBaseUrl(String url) {
     _baseUrl = url;
     notifyListeners();
+  }
+
+  Map<String, String> _getHeaders({bool includeJson = false}) {
+    final Map<String, String> headers = {};
+    if (includeJson) {
+      headers['Content-Type'] = 'application/json';
+    }
+    if (_token != null) {
+      headers['Authorization'] = 'Bearer $_token';
+    }
+    return headers;
   }
 
   // Helper loader state
@@ -52,6 +68,7 @@ class QuestLogProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
+        _token = idToken; // Simpan token untuk request berikutnya
         _currentUser = User.fromJson(json.decode(response.body));
         await refreshAllData();
         _setLoading(false);
@@ -73,7 +90,7 @@ class QuestLogProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/users/${_currentUser!.id}/class'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getHeaders(includeJson: true),
         body: json.encode({'classType': classType.toUpperCase()}),
       );
 
@@ -94,7 +111,10 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> refreshProfile() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/users/${_currentUser!.id}'));
+      final response = await http.get(
+        Uri.parse('$_baseUrl/users/${_currentUser!.id}'),
+        headers: _getHeaders(),
+      );
       if (response.statusCode == 200) {
         _currentUser = User.fromJson(json.decode(response.body));
         notifyListeners();
@@ -108,7 +128,10 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchDailyQuests() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/quests/daily/${_currentUser!.id}'));
+      final response = await http.get(
+        Uri.parse('$_baseUrl/quests/daily/${_currentUser!.id}'),
+        headers: _getHeaders(),
+      );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _dailyQuests = data.map((q) => Quest.fromJson(q)).toList();
@@ -123,10 +146,14 @@ class QuestLogProvider with ChangeNotifier {
   Future<bool> completeQuest(int questId) async {
     _setLoading(true);
     try {
-      final response = await http.post(Uri.parse('$_baseUrl/quests/$questId/complete'));
+      final response = await http.post(
+        Uri.parse('$_baseUrl/quests/$questId/complete'),
+        headers: _getHeaders(),
+      );
       if (response.statusCode == 200) {
         await refreshProfile();
         await fetchDailyQuests();
+        await fetchAchievements(); // Refresh pencapaian jika ada yang terbuka
         _setLoading(false);
         return true;
       }
@@ -141,7 +168,10 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchDailyWorkouts() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/workouts/daily/${_currentUser!.id}'));
+      final response = await http.get(
+        Uri.parse('$_baseUrl/workouts/daily/${_currentUser!.id}'),
+        headers: _getHeaders(),
+      );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _dailyWorkouts = data.map((w) => WorkoutLog.fromJson(w)).toList();
@@ -167,7 +197,7 @@ class QuestLogProvider with ChangeNotifier {
 
       final response = await http.post(
         Uri.parse('$_baseUrl/workouts'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getHeaders(includeJson: true),
         body: json.encode(log.toJson()),
       );
 
@@ -175,6 +205,7 @@ class QuestLogProvider with ChangeNotifier {
         await refreshProfile();
         await fetchDailyWorkouts();
         await fetchDailyQuests(); // Update status quest jika ada kecocokan
+        await fetchAchievements(); // Refresh pencapaian jika terbuka
         _setLoading(false);
         return true;
       }
@@ -189,7 +220,10 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchDailyDiet() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/diet/daily/${_currentUser!.id}'));
+      final response = await http.get(
+        Uri.parse('$_baseUrl/diet/daily/${_currentUser!.id}'),
+        headers: _getHeaders(),
+      );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _dailyDiet = data.map((d) => DietLog.fromJson(d)).toList();
@@ -216,7 +250,7 @@ class QuestLogProvider with ChangeNotifier {
 
       final response = await http.post(
         Uri.parse('$_baseUrl/diet'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getHeaders(includeJson: true),
         body: json.encode(log.toJson()),
       );
 
@@ -224,6 +258,7 @@ class QuestLogProvider with ChangeNotifier {
         await refreshProfile();
         await fetchDailyDiet();
         await fetchDailyQuests(); // Update status quest jika ada kecocokan
+        await fetchAchievements(); // Refresh pencapaian jika terbuka
         _setLoading(false);
         return true;
       }
@@ -237,7 +272,10 @@ class QuestLogProvider with ChangeNotifier {
   // Fetch Leaderboard
   Future<void> fetchLeaderboard() async {
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/users/leaderboard'));
+      final response = await http.get(
+        Uri.parse('$_baseUrl/users/leaderboard'),
+        headers: _getHeaders(),
+      );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _leaderboard = data.map((u) => User.fromJson(u)).toList();
@@ -248,6 +286,24 @@ class QuestLogProvider with ChangeNotifier {
     }
   }
 
+  // Fetch Achievements
+  Future<void> fetchAchievements() async {
+    if (_currentUser == null) return;
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/achievements/user/${_currentUser!.id}'),
+        headers: _getHeaders(),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        _achievements = data.map((a) => Achievement.fromJson(a)).toList();
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Gagal mengambil pencapaian pahlawan: $e');
+    }
+  }
+
   // Buy Premium (Redirect ke Stripe Checkout Session)
   Future<bool> buyPremium() async {
     if (_currentUser == null) return false;
@@ -255,7 +311,7 @@ class QuestLogProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/premium/checkout'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getHeaders(includeJson: true),
         body: json.encode({'userId': _currentUser!.id}),
       );
 
@@ -286,14 +342,17 @@ class QuestLogProvider with ChangeNotifier {
     await fetchDailyWorkouts();
     await fetchDailyDiet();
     await fetchLeaderboard();
+    await fetchAchievements();
   }
 
   // Logout
   void logout() {
     _currentUser = null;
+    _token = null;
     _dailyQuests = [];
     _dailyWorkouts = [];
     _dailyDiet = [];
+    _achievements = [];
     notifyListeners();
   }
 }

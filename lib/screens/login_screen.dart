@@ -13,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _mockController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController(text: 'http://localhost:8080/api');
+  final TextEditingController _ipController = TextEditingController(text: 'http://localhost:8080/api/v1');
 
   @override
   Widget build(BuildContext context) {

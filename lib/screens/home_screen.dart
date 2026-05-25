@@ -8,6 +8,7 @@ import 'diet_screen.dart';
 import 'leaderboard_screen.dart';
 import 'premium_screen.dart';
 import 'login_screen.dart';
+import 'achievements_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -108,6 +109,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(width: 12),
             ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.emoji_events, color: Colors.amber),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AchievementsScreen()),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white70),
