@@ -1,6 +1,6 @@
 {
-    "name": "questlog_frontend",
-    "short_name": "questlog_frontend",
+    "name": "QuestLog",
+    "short_name": "QuestLog",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

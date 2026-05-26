@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="questlog_frontend"
+        android:label="QuestLog"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
