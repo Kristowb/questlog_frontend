@@ -56,6 +56,23 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+
+    // Penamaan file APK rilis kustom agar lebih user-friendly
+    @Suppress("DEPRECATION")
+    applicationVariants.all {
+        val variantName = versionName
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val originalName = output.outputFileName
+            val friendlyName = when {
+                originalName.contains("arm64-v8a") -> "Android_Modern_64bit"
+                originalName.contains("armeabi-v7a") -> "Android_Lama_32bit"
+                originalName.contains("x86_64") -> "Emulator_PC"
+                else -> "universal"
+            }
+            output.outputFileName = "QuestLog_v${variantName}_${friendlyName}.apk"
+        }
+    }
 }
 
 flutter {
