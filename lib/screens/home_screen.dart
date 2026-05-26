@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
+import '../services/update_manager.dart';
 import '../models/quest.dart';
 import 'workout_screen.dart';
 import 'diet_screen.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Tarik data awal saat masuk home
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<QuestLogProvider>(context, listen: false).refreshAllData();
+      UpdateManager.checkForUpdate(context);
     });
   }
 
