@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 import '../models/quest.dart';
 import 'workout_screen.dart';
@@ -73,90 +74,103 @@ class _HomeScreenState extends State<HomeScreen> {
       const PremiumScreen(),
     ];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF07050E),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0B1E),
-        elevation: 0,
-        title: Row(
-          children: [
-            Icon(isWarrior ? Icons.shield : Icons.double_arrow, color: classColor),
-            const SizedBox(width: 10),
-            Text(
-              isWarrior ? 'WARRIOR DASHBOARD' : 'ARCHER DASHBOARD',
-              style: const TextStyle(
-                fontFamily: 'Outfit',
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.5,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF1F1235), // Dark purple
+            Color(0xFF0F0B1E), // Darker violet
+            Color(0xFF07050E), // Pure dark
+          ],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Row(
+            children: [
+              Icon(isWarrior ? Icons.shield : Icons.double_arrow, color: classColor),
+              const SizedBox(width: 10),
+              Text(
+                isWarrior ? 'WARRIOR DASHBOARD' : 'ARCHER DASHBOARD',
+                style: const TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                ),
               ),
+            ],
+          ),
+          actions: [
+            // Coins Indicator
+            Row(
+              children: [
+                const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
+                const SizedBox(width: 4),
+                Text(
+                  '${user.coins}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.emoji_events, color: Colors.amber),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AchievementsScreen()),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white70),
+              onPressed: () {
+                provider.logout();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
             ),
           ],
         ),
-        actions: [
-          // Coins Indicator
-          Row(
-            children: [
-              const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
-              const SizedBox(width: 4),
-              Text(
-                '${user.coins}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(width: 12),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.emoji_events, color: Colors.amber),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AchievementsScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white70),
-            onPressed: () {
-              provider.logout();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await provider.refreshAllData();
-        },
-        child: pages[_currentIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0F0B1E),
-        selectedItemColor: classColor,
-        unselectedItemColor: const Color(0xFFA099B0),
-        selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-        unselectedLabelStyle: const TextStyle(fontSize: 11),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_customize), label: 'Status'),
-          BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Workout'),
-          BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: 'Diet'),
-          BottomNavigationBarItem(icon: Icon(Icons.leaderboard), label: 'Rank'),
-          BottomNavigationBarItem(icon: Icon(Icons.storefront), label: 'Store'),
-        ],
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await provider.refreshAllData();
+          },
+          child: pages[_currentIndex],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: const Color(0xFF07050E),
+          selectedItemColor: classColor,
+          unselectedItemColor: const Color(0xFFA099B0),
+          selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: const TextStyle(fontSize: 11),
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard_customize), label: 'Status'),
+            BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Workout'),
+            BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: 'Diet'),
+            BottomNavigationBarItem(icon: Icon(Icons.leaderboard), label: 'Rank'),
+            BottomNavigationBarItem(icon: Icon(Icons.storefront), label: 'Store'),
+          ],
+        ),
       ),
     );
   }
@@ -187,8 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [const Color(0xFF1E1C2C), const Color(0xFF131120)],
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E1C2C), Color(0xFF131120)],
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0xFF2D2A42)),
@@ -344,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          ),
+          ).animate().fade(duration: 400.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 28),
 
           // 2. Nutrisi Makro (Diet Meat-Heavy)
@@ -357,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
               letterSpacing: 1.2,
             ),
-          ),
+          ).animate().fade(duration: 400.ms, delay: 100.ms),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(20),
@@ -423,7 +437,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          ),
+          ).animate().fade(duration: 450.ms, delay: 150.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 28),
 
           // 3. Quest Harian
@@ -449,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
-          ),
+          ).animate().fade(duration: 400.ms, delay: 200.ms),
           const SizedBox(height: 12),
 
           // List Quest
@@ -470,7 +484,10 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: provider.dailyQuests.length,
               itemBuilder: (context, index) {
                 final quest = provider.dailyQuests[index];
-                return _buildQuestItem(context, quest, provider, classColor);
+                return _buildQuestItem(context, quest, provider, classColor)
+                    .animate()
+                    .fade(duration: 300.ms, delay: (250 + index * 60).ms)
+                    .slideX(begin: 0.15, end: 0, curve: Curves.easeOutQuad);
               },
             ),
           ],

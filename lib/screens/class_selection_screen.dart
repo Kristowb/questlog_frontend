@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 import 'home_screen.dart';
 
@@ -17,118 +18,131 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<QuestLogProvider>(context);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF07050E),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(28.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'PILIH KELAS RPG ANDA',
-                style: TextStyle(
-                  fontFamily: 'Outfit',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Tentukan jalan kebugaran fisik Anda. Pilihan kelas akan menyesuaikan quest harian dan statistik karakter Anda.',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  color: Color(0xFFA099B0),
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 36),
-              
-              // Kartu Class Selection
-              Expanded(
-                child: Row(
-                  children: [
-                    // Warrior
-                    Expanded(
-                      child: _buildClassCard(
-                        classId: 'WARRIOR',
-                        title: 'WARRIOR',
-                        icon: Icons.shield,
-                        accentColor: const Color(0xFFE94057),
-                        description: 'Fokus pada angkat beban & pembentukan otot (Bodybuilding).',
-                        stats: {
-                          'Strength (STR)': 90,
-                          'Stamina (STM)': 50,
-                          'Vitality (VIT)': 70,
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Archer
-                    Expanded(
-                      child: _buildClassCard(
-                        classId: 'ARCHER',
-                        title: 'ARCHER',
-                        icon: Icons.double_arrow,
-                        accentColor: const Color(0xFF00D4B2),
-                        description: 'Fokus pada latihan ketahanan kardio & pembakaran lemak.',
-                        stats: {
-                          'Strength (STR)': 60,
-                          'Stamina (STM)': 90,
-                          'Vitality (VIT)': 80,
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 36),
-
-              // Button Mulai Petualangan
-              ElevatedButton(
-                onPressed: _selectedClass == null || provider.isLoading
-                    ? null
-                    : () async {
-                        bool success = await provider.chooseClass(_selectedClass!);
-                        if (success && mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomeScreen()),
-                          );
-                        }
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _selectedClass == 'WARRIOR' 
-                      ? const Color(0xFFE94057) 
-                      : const Color(0xFF00D4B2),
-                  disabledBackgroundColor: const Color(0xFF1E1C2C),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF1F1235), // Dark purple
+            Color(0xFF0F0B1E), // Darker violet
+            Color(0xFF07050E), // Pure dark
+          ],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  'PILIH KELAS RPG ANDA',
+                  style: TextStyle(
+                    fontFamily: 'Outfit',
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 1.5,
                   ),
-                  elevation: 5,
-                  shadowColor: _selectedClass == 'WARRIOR' 
-                      ? const Color(0xFFE94057).withOpacity(0.4) 
-                      : const Color(0xFF00D4B2).withOpacity(0.4),
-                ),
-                child: provider.isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                        'MULAI PETUALANGAN',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                        ),
+                ).animate().fade(duration: 400.ms).slideY(begin: -0.2, end: 0, curve: Curves.easeOut),
+                const SizedBox(height: 8),
+                const Text(
+                  'Tentukan jalan kebugaran fisik Anda. Pilihan kelas akan menyesuaikan quest harian dan statistik karakter Anda.',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: Color(0xFFA099B0),
+                    height: 1.5,
+                  ),
+                ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOut),
+                const SizedBox(height: 36),
+                
+                // Kartu Class Selection
+                Expanded(
+                  child: Row(
+                    children: [
+                      // Warrior
+                      Expanded(
+                        child: _buildClassCard(
+                          classId: 'WARRIOR',
+                          title: 'WARRIOR',
+                          icon: Icons.shield,
+                          accentColor: const Color(0xFFE94057),
+                          description: 'Fokus pada angkat beban & pembentukan otot (Bodybuilding).',
+                          stats: {
+                            'Strength (STR)': 90,
+                            'Stamina (STM)': 50,
+                            'Vitality (VIT)': 70,
+                          },
+                        ).animate().fade(duration: 450.ms, delay: 200.ms).scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOutBack),
                       ),
-              ),
-              const SizedBox(height: 10),
-            ],
+                      const SizedBox(width: 16),
+                      // Archer
+                      Expanded(
+                        child: _buildClassCard(
+                          classId: 'ARCHER',
+                          title: 'ARCHER',
+                          icon: Icons.double_arrow,
+                          accentColor: const Color(0xFF00D4B2),
+                          description: 'Fokus pada latihan ketahanan kardio & pembakaran lemak.',
+                          stats: {
+                            'Strength (STR)': 60,
+                            'Stamina (STM)': 90,
+                            'Vitality (VIT)': 80,
+                          },
+                        ).animate().fade(duration: 450.ms, delay: 300.ms).scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOutBack),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 36),
+
+                // Button Mulai Petualangan
+                ElevatedButton(
+                  onPressed: _selectedClass == null || provider.isLoading
+                      ? null
+                      : () async {
+                          bool success = await provider.chooseClass(_selectedClass!);
+                          if (success && mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedClass == 'WARRIOR' 
+                        ? const Color(0xFFE94057) 
+                        : const Color(0xFF00D4B2),
+                    disabledBackgroundColor: const Color(0xFF1E1C2C),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 5,
+                    shadowColor: _selectedClass == 'WARRIOR' 
+                        ? const Color(0xFFE94057).withOpacity(0.5) 
+                        : const Color(0xFF00D4B2).withOpacity(0.5),
+                  ),
+                  child: provider.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'MULAI PETUALANGAN',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                ).animate().fade(duration: 400.ms, delay: 400.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOut),
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),
@@ -164,9 +178,10 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: accentColor.withOpacity(0.2),
-                    blurRadius: 15,
+                    color: accentColor.withOpacity(0.35),
+                    blurRadius: 20,
                     spreadRadius: 2,
+                    offset: const Offset(0, 4),
                   )
                 ]
               : null,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class DietScreen extends StatefulWidget {
@@ -59,6 +60,32 @@ class _DietScreenState extends State<DietScreen> {
     });
   }
 
+  InputDecoration _buildInputDecoration({required String labelText, required double labelFontSize}) {
+    return InputDecoration(
+      labelText: labelText,
+      labelStyle: TextStyle(color: const Color(0xFFA099B0), fontSize: labelFontSize),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      filled: true,
+      fillColor: const Color(0xFF1E1C2C).withOpacity(0.3),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF2D2A42)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF00D4B2), width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<QuestLogProvider>(context);
@@ -77,14 +104,14 @@ class _DietScreenState extends State<DietScreen> {
               color: Colors.white,
               letterSpacing: 1.2,
             ),
-          ),
+          ).animate().fade(duration: 350.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 12),
 
           // Pilihan Preset Daging Cepat (RPG Feast templates)
           const Text(
             'PRESET MAKANAN PROTEIN TINGGI:',
             style: TextStyle(color: Color(0xFFA099B0), fontSize: 10, fontWeight: FontWeight.bold),
-          ),
+          ).animate().fade(duration: 350.ms, delay: 50.ms),
           const SizedBox(height: 8),
           SizedBox(
             height: 38,
@@ -107,7 +134,7 @@ class _DietScreenState extends State<DietScreen> {
                 );
               },
             ),
-          ),
+          ).animate().fade(duration: 400.ms, delay: 80.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 16),
 
           // Form Log Nutrisi
@@ -124,29 +151,19 @@ class _DietScreenState extends State<DietScreen> {
                 children: [
                   TextFormField(
                     controller: _foodController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: 'Nama Makanan / Hidangan',
-                      labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00D4B2))),
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: _buildInputDecoration(labelText: 'Nama Makanan / Hidangan', labelFontSize: 13),
                     validator: (v) => v == null || v.isEmpty ? 'Masukkan nama makanan' : null,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Row(
                     children: [
                       Expanded(
                         child: TextFormField(
                           controller: _proteinController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Protein (g)',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 11),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00D4B2))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'P (g)', labelFontSize: 11),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
@@ -155,13 +172,8 @@ class _DietScreenState extends State<DietScreen> {
                         child: TextFormField(
                           controller: _fatController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Lemak (g)',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 11),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00D4B2))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'L (g)', labelFontSize: 11),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
@@ -170,13 +182,8 @@ class _DietScreenState extends State<DietScreen> {
                         child: TextFormField(
                           controller: _carbsController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Karbo (g)',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 11),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00D4B2))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'K (g)', labelFontSize: 11),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
@@ -185,19 +192,14 @@ class _DietScreenState extends State<DietScreen> {
                         child: TextFormField(
                           controller: _caloriesController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Energi (kkal)',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 11),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00D4B2))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'Kkal', labelFontSize: 11),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   ElevatedButton(
                     onPressed: provider.isLoading
                         ? null
@@ -228,17 +230,22 @@ class _DietScreenState extends State<DietScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00D4B2),
                       foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 44),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 4,
+                      shadowColor: const Color(0xFF00D4B2).withOpacity(0.3),
                     ),
                     child: provider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('CATAT FEAST (KLAIM +10 VIT XP)', style: TextStyle(fontWeight: FontWeight.bold)),
+                        : const Text(
+                            'CATAT FEAST (KLAIM +10 VIT XP)',
+                            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+                          ),
                   ),
                 ],
               ),
             ),
-          ),
+          ).animate().fade(duration: 450.ms, delay: 150.ms).slideY(begin: 0.15, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 24),
 
           // Riwayat Makan Hari Ini
@@ -251,7 +258,7 @@ class _DietScreenState extends State<DietScreen> {
               color: Colors.white,
               letterSpacing: 1.2,
             ),
-          ),
+          ).animate().fade(duration: 400.ms, delay: 200.ms),
           const SizedBox(height: 12),
 
           Expanded(
@@ -312,7 +319,9 @@ class _DietScreenState extends State<DietScreen> {
                             ),
                           ],
                         ),
-                      );
+                      ).animate()
+                       .fade(duration: 300.ms, delay: (250 + index * 60).ms)
+                       .slideX(begin: 0.15, end: 0, curve: Curves.easeOutQuad);
                     },
                   ),
           ),

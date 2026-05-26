@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class WorkoutScreen extends StatefulWidget {
@@ -15,6 +16,32 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   final _setsController = TextEditingController();
   final _repsController = TextEditingController();
   final _weightController = TextEditingController();
+
+  InputDecoration _buildInputDecoration({required String labelText, required double labelFontSize}) {
+    return InputDecoration(
+      labelText: labelText,
+      labelStyle: TextStyle(color: const Color(0xFFA099B0), fontSize: labelFontSize),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      filled: true,
+      fillColor: const Color(0xFF1E1C2C).withOpacity(0.3),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF2D2A42)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE94057), width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +61,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               color: Colors.white,
               letterSpacing: 1.2,
             ),
-          ),
+          ).animate().fade(duration: 350.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 16),
 
           // Form Input Latihan
@@ -51,29 +78,22 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 children: [
                   TextFormField(
                     controller: _exerciseController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: _buildInputDecoration(
                       labelText: 'Nama Latihan (misal: Bench Press, Squat)',
-                      labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFE94057))),
+                      labelFontSize: 13,
                     ),
                     validator: (v) => v == null || v.isEmpty ? 'Masukkan nama latihan' : null,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Row(
                     children: [
                       Expanded(
                         child: TextFormField(
                           controller: _setsController,
                           keyboardType: TextInputType.number,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Set',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFE94057))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'Set', labelFontSize: 12),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
@@ -82,13 +102,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         child: TextFormField(
                           controller: _repsController,
                           keyboardType: TextInputType.number,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Repetisi',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFE94057))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'Reps', labelFontSize: 12),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
@@ -97,19 +112,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         child: TextFormField(
                           controller: _weightController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: 'Beban (kg)',
-                            labelStyle: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
-                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1E1C2C))),
-                            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFE94057))),
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          decoration: _buildInputDecoration(labelText: 'Beban (kg)', labelFontSize: 12),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib' : null,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   ElevatedButton(
                     onPressed: provider.isLoading
                         ? null
@@ -138,17 +148,22 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFE94057),
                       foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 44),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 4,
+                      shadowColor: const Color(0xFFE94057).withOpacity(0.3),
                     ),
                     child: provider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('CATAT LATIHAN (KLAIM +10 STR XP)', style: TextStyle(fontWeight: FontWeight.bold)),
+                        : const Text(
+                            'CATAT LATIHAN (KLAIM +10 STR XP)',
+                            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+                          ),
                   ),
                 ],
               ),
             ),
-          ),
+          ).animate().fade(duration: 450.ms, delay: 100.ms).slideY(begin: 0.15, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 24),
 
           // Riwayat Latihan Hari Ini
@@ -161,7 +176,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               color: Colors.white,
               letterSpacing: 1.2,
             ),
-          ),
+          ).animate().fade(duration: 400.ms, delay: 180.ms),
           const SizedBox(height: 12),
           
           Expanded(
@@ -222,7 +237,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                             ),
                           ],
                         ),
-                      );
+                      ).animate()
+                       .fade(duration: 300.ms, delay: (220 + index * 60).ms)
+                       .slideX(begin: 0.15, end: 0, curve: Curves.easeOutQuad);
                     },
                   ),
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class PremiumScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     final user = provider.currentUser;
 
     if (user == null) {
-      return const Center(child: Text('Silakan login terlebih dahulu.'));
+      return const Center(child: Text('Silakan login terlebih dahulu.', style: TextStyle(color: Colors.white)));
     }
 
     final isWarrior = user.classType == 'WARRIOR';
@@ -27,7 +28,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 10),
-          // Icon premium glow
+          // Icon premium glow dengan pulsing animation
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -46,7 +47,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
               size: 72,
               color: Colors.amber,
             ),
-          ),
+          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+           .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.08, 1.08), duration: 1500.ms, curve: Curves.easeInOut),
           const SizedBox(height: 20),
           const Text(
             'PRO ADVENTURER PACK',
@@ -57,13 +59,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
               color: Colors.white,
               letterSpacing: 2,
             ),
-          ),
+          ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 8),
           const Text(
             'Buka kekuatan penuh pahlawan Anda selamanya.',
-            style: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
+            style: TextStyle(color: const Color(0xFFA099B0), fontSize: 13),
             textAlign: TextAlign.center,
-          ),
+          ).animate().fade(duration: 400.ms, delay: 100.ms),
           const SizedBox(height: 28),
 
           // Kondisi jika sudah premium
@@ -74,6 +76,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 color: const Color(0xFF1E1C2C),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.amber, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.amber.withOpacity(0.1),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                  )
+                ]
               ),
               child: Column(
                 children: [
@@ -92,7 +101,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   const Text(
                     'Selamat! Anda telah mengaktifkan Pro Adventurer Pack. Fitur analitik daging & penjadwalan latihan otomatis telah terbuka.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFFA099B0), fontSize: 12),
+                    style: TextStyle(color: const Color(0xFFA099B0), fontSize: 12),
                   ),
                   const SizedBox(height: 20),
                   // Premium advanced feature (simulasi)
@@ -104,29 +113,33 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       backgroundColor: Colors.amber,
                       foregroundColor: Colors.black,
                       minimumSize: const Size(double.infinity, 44),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     child: const Text('GENERATE JADWAL LATIHAN INTENSIF', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
-            ),
+            ).animate().fade(duration: 450.ms, delay: 200.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
           ] else ...[
-            // Manfaat Premium
+            // Manfaat Premium dengan staggered entrance
             _buildFeatureBenefit(
               icon: Icons.auto_awesome,
               title: 'Auto-Generate Jadwal Latihan',
               desc: 'Hasilkan rancangan program latihan intensif berminggu-minggu yang disesuaikan secara otomatis.',
-            ),
+            ).animate().fade(duration: 400.ms, delay: 150.ms).slideX(begin: -0.1, end: 0, curve: Curves.easeOut),
+            
             _buildFeatureBenefit(
               icon: Icons.analytics,
               title: 'Analitik Diet Meat-Heavy',
               desc: 'Analisis asupan protein & makronutrisi daging tingkat lanjut untuk efisiensi pertumbuhan otot maksimal.',
-            ),
+            ).animate().fade(duration: 400.ms, delay: 250.ms).slideX(begin: -0.1, end: 0, curve: Curves.easeOut),
+            
             _buildFeatureBenefit(
               icon: Icons.star,
               title: 'Lambang Emas Leaderboard',
               desc: 'Beri tanda bintang emas premium eksklusif untuk nama pahlawan Anda di papan peringkat global.',
-            ),
+            ).animate().fade(duration: 400.ms, delay: 350.ms).slideX(begin: -0.1, end: 0, curve: Curves.easeOut),
+            
             const SizedBox(height: 36),
 
             // Harga dan Tombol Beli
@@ -185,10 +198,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             'AKTIFKAN PRO ADVENTURER',
                             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 1),
                           ),
-                  ),
+                  ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                   .shimmer(delay: 2500.ms, duration: 1800.ms),
                 ],
               ),
-            ),
+            ).animate().fade(duration: 450.ms, delay: 450.ms).slideY(begin: 0.15, end: 0, curve: Curves.easeOut),
           ],
         ],
       ),

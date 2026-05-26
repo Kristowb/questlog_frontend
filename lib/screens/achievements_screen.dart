@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 import '../models/achievement.dart';
 
@@ -15,45 +16,61 @@ class AchievementsScreen extends StatelessWidget {
     final isWarrior = user?.classType == 'WARRIOR';
     final classColor = isWarrior ? const Color(0xFFE94057) : const Color(0xFF00D4B2);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF07050E),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0B1E),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'TROPHY ROOM',
-          style: TextStyle(
-            fontFamily: 'Outfit',
-            fontSize: 18,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-            color: Colors.white,
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF1F1235), // Dark purple
+            Color(0xFF0F0B1E), // Darker violet
+            Color(0xFF07050E), // Pure dark
+          ],
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await provider.fetchAchievements();
-        },
-        child: achievements.isEmpty
-            ? const Center(
-                child: Text(
-                  'Tidak ada pencapaian yang ditemukan.',
-                  style: TextStyle(color: Color(0xFFA099B0), fontFamily: 'Inter'),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'TROPHY ROOM',
+            style: TextStyle(
+              fontFamily: 'Outfit',
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await provider.fetchAchievements();
+          },
+          child: achievements.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Tidak ada pencapaian yang ditemukan.',
+                    style: TextStyle(color: Color(0xFFA099B0), fontFamily: 'Inter'),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(20.0),
+                  itemCount: achievements.length,
+                  itemBuilder: (context, index) {
+                    final ach = achievements[index];
+                    return _buildAchievementCard(ach, classColor)
+                        .animate()
+                        .fade(duration: 300.ms, delay: (index * 80).ms)
+                        .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuad);
+                  },
                 ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.all(20.0),
-                itemCount: achievements.length,
-                itemBuilder: (context, index) {
-                  final ach = achievements[index];
-                  return _buildAchievementCard(ach, classColor);
-                },
-              ),
+        ),
       ),
     );
   }
@@ -69,13 +86,17 @@ class AchievementsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: ach.isUnlocked ? classColor.withOpacity(0.4) : borderColor, width: ach.isUnlocked ? 1.5 : 1.0),
+        border: Border.all(
+          color: ach.isUnlocked ? classColor.withOpacity(0.5) : borderColor,
+          width: ach.isUnlocked ? 1.5 : 1.0,
+        ),
         boxShadow: ach.isUnlocked
             ? [
                 BoxShadow(
-                  color: classColor.withOpacity(0.08),
-                  blurRadius: 10,
+                  color: classColor.withOpacity(0.15),
+                  blurRadius: 12,
                   spreadRadius: 1,
+                  offset: const Offset(0, 4),
                 )
               ]
             : null,
@@ -95,13 +116,7 @@ class AchievementsScreen extends StatelessWidget {
               ),
             ),
             child: Center(
-              child: Text(
-                ach.icon,
-                style: TextStyle(
-                  fontSize: 28,
-                  color: Colors.white.withOpacity(opacity),
-                ),
-              ),
+              child: _getAchievementIcon(ach.icon, classColor, opacity),
             ),
           ),
           const SizedBox(width: 16),
@@ -155,6 +170,51 @@ class AchievementsScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _getAchievementIcon(String iconEmoji, Color classColor, double opacity) {
+    String? assetPath;
+    switch (iconEmoji) {
+      case '🏆':
+        assetPath = 'assets/images/achievements/iron_warrior.png';
+        break;
+      case '🥩':
+        assetPath = 'assets/images/achievements/carnivore_king.png';
+        break;
+      case '👑':
+        assetPath = 'assets/images/achievements/quest_champion.png';
+        break;
+      case '💧':
+        assetPath = 'assets/images/achievements/hydration_devotee.png';
+        break;
+    }
+
+    if (assetPath != null) {
+      return Image.asset(
+        assetPath,
+        width: 32,
+        height: 32,
+        color: opacity < 1.0 ? Colors.white.withOpacity(0.3) : null,
+        colorBlendMode: opacity < 1.0 ? BlendMode.modulate : null,
+        errorBuilder: (context, error, stackTrace) {
+          return Text(
+            iconEmoji,
+            style: TextStyle(
+              fontSize: 28,
+              color: Colors.white.withOpacity(opacity),
+            ),
+          );
+        },
+      );
+    }
+
+    return Text(
+      iconEmoji,
+      style: TextStyle(
+        fontSize: 28,
+        color: Colors.white.withOpacity(opacity),
       ),
     );
   }

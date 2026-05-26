@@ -1,17 +1,16 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import '../config/app_config.dart';
 import '../models/user.dart';
 import '../models/quest.dart';
 import '../models/workout_log.dart';
 import '../models/diet_log.dart';
 import '../models/achievement.dart';
+import '../services/api_client.dart';
 
 class QuestLogProvider with ChangeNotifier {
-  // Gunakan IP 10.0.2.2 untuk Android Emulator, localhost untuk Desktop/Web
-  // Kita buat deteksi otomatis sederhana
-  String _baseUrl = 'http://localhost:8080/api/v1';
+  String _baseUrl = AppConfig.backendUrl;
+  late final ApiClient _apiClient;
   
   User? _currentUser;
   String? _token;
@@ -22,6 +21,10 @@ class QuestLogProvider with ChangeNotifier {
   List<Achievement> _achievements = [];
   bool _isLoading = false;
   String? _errorMessage;
+
+  QuestLogProvider() {
+    _apiClient = ApiClient(baseUrl: _baseUrl);
+  }
 
   // Getters
   User? get currentUser => _currentUser;
@@ -36,18 +39,8 @@ class QuestLogProvider with ChangeNotifier {
 
   void setBaseUrl(String url) {
     _baseUrl = url;
+    _apiClient.updateBaseUrl(url);
     notifyListeners();
-  }
-
-  Map<String, String> _getHeaders({bool includeJson = false}) {
-    final Map<String, String> headers = {};
-    if (includeJson) {
-      headers['Content-Type'] = 'application/json';
-    }
-    if (_token != null) {
-      headers['Authorization'] = 'Bearer $_token';
-    }
-    return headers;
   }
 
   // Helper loader state
@@ -61,20 +54,20 @@ class QuestLogProvider with ChangeNotifier {
     _setLoading(true);
     _errorMessage = null;
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/google'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'idToken': idToken}),
+      final response = await _apiClient.dio.post(
+        '/auth/google',
+        data: {'idToken': idToken},
       );
 
       if (response.statusCode == 200) {
-        _token = idToken; // Simpan token untuk request berikutnya
-        _currentUser = User.fromJson(json.decode(response.body));
+        _token = idToken; // Simpan token secara lokal
+        _apiClient.updateToken(idToken); // Update token untuk interceptor ApiClient
+        _currentUser = User.fromJson(response.data);
         await refreshAllData();
         _setLoading(false);
         return true;
       } else {
-        _errorMessage = 'Gagal masuk: ${response.body}';
+        _errorMessage = 'Gagal masuk: ${response.data}';
       }
     } catch (e) {
       _errorMessage = 'Kesalahan koneksi server: $e';
@@ -88,14 +81,13 @@ class QuestLogProvider with ChangeNotifier {
     if (_currentUser == null) return false;
     _setLoading(true);
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/users/${_currentUser!.id}/class'),
-        headers: _getHeaders(includeJson: true),
-        body: json.encode({'classType': classType.toUpperCase()}),
+      final response = await _apiClient.dio.post(
+        '/users/${_currentUser!.id}/class',
+        data: {'classType': classType.toUpperCase()},
       );
 
       if (response.statusCode == 200) {
-        _currentUser = User.fromJson(json.decode(response.body));
+        _currentUser = User.fromJson(response.data);
         await refreshAllData();
         _setLoading(false);
         return true;
@@ -111,12 +103,11 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> refreshProfile() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/users/${_currentUser!.id}'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.get(
+        '/users/${_currentUser!.id}',
       );
       if (response.statusCode == 200) {
-        _currentUser = User.fromJson(json.decode(response.body));
+        _currentUser = User.fromJson(response.data);
         notifyListeners();
       }
     } catch (e) {
@@ -128,12 +119,11 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchDailyQuests() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/quests/daily/${_currentUser!.id}'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.get(
+        '/quests/daily/${_currentUser!.id}',
       );
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         _dailyQuests = data.map((q) => Quest.fromJson(q)).toList();
         notifyListeners();
       }
@@ -146,9 +136,8 @@ class QuestLogProvider with ChangeNotifier {
   Future<bool> completeQuest(int questId) async {
     _setLoading(true);
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/quests/$questId/complete'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.post(
+        '/quests/$questId/complete',
       );
       if (response.statusCode == 200) {
         await refreshProfile();
@@ -168,12 +157,11 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchDailyWorkouts() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/workouts/daily/${_currentUser!.id}'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.get(
+        '/workouts/daily/${_currentUser!.id}',
       );
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         _dailyWorkouts = data.map((w) => WorkoutLog.fromJson(w)).toList();
         notifyListeners();
       }
@@ -195,10 +183,9 @@ class QuestLogProvider with ChangeNotifier {
         weight: weight,
       );
 
-      final response = await http.post(
-        Uri.parse('$_baseUrl/workouts'),
-        headers: _getHeaders(includeJson: true),
-        body: json.encode(log.toJson()),
+      final response = await _apiClient.dio.post(
+        '/workouts',
+        data: log.toJson(),
       );
 
       if (response.statusCode == 200) {
@@ -220,12 +207,11 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchDailyDiet() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/diet/daily/${_currentUser!.id}'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.get(
+        '/diet/daily/${_currentUser!.id}',
       );
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         _dailyDiet = data.map((d) => DietLog.fromJson(d)).toList();
         notifyListeners();
       }
@@ -248,10 +234,9 @@ class QuestLogProvider with ChangeNotifier {
         calories: calories,
       );
 
-      final response = await http.post(
-        Uri.parse('$_baseUrl/diet'),
-        headers: _getHeaders(includeJson: true),
-        body: json.encode(log.toJson()),
+      final response = await _apiClient.dio.post(
+        '/diet',
+        data: log.toJson(),
       );
 
       if (response.statusCode == 200) {
@@ -272,12 +257,11 @@ class QuestLogProvider with ChangeNotifier {
   // Fetch Leaderboard
   Future<void> fetchLeaderboard() async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/users/leaderboard'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.get(
+        '/users/leaderboard',
       );
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         _leaderboard = data.map((u) => User.fromJson(u)).toList();
         notifyListeners();
       }
@@ -290,12 +274,11 @@ class QuestLogProvider with ChangeNotifier {
   Future<void> fetchAchievements() async {
     if (_currentUser == null) return;
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/achievements/user/${_currentUser!.id}'),
-        headers: _getHeaders(),
+      final response = await _apiClient.dio.get(
+        '/achievements/user/${_currentUser!.id}',
       );
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         _achievements = data.map((a) => Achievement.fromJson(a)).toList();
         notifyListeners();
       }
@@ -309,14 +292,13 @@ class QuestLogProvider with ChangeNotifier {
     if (_currentUser == null) return false;
     _setLoading(true);
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/premium/checkout'),
-        headers: _getHeaders(includeJson: true),
-        body: json.encode({'userId': _currentUser!.id}),
+      final response = await _apiClient.dio.post(
+        '/premium/checkout',
+        data: {'userId': _currentUser!.id},
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = response.data;
         final String checkoutUrl = data['checkoutUrl'];
         
         final Uri url = Uri.parse(checkoutUrl);
@@ -349,6 +331,7 @@ class QuestLogProvider with ChangeNotifier {
   void logout() {
     _currentUser = null;
     _token = null;
+    _apiClient.updateToken(null); // Reset token di ApiClient
     _dailyQuests = [];
     _dailyWorkouts = [];
     _dailyDiet = [];

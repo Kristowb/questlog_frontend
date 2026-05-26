@@ -43,7 +43,7 @@ class Achievement {
       'type': type,
       'requirement': requirement,
       'isUnlocked': isUnlocked,
-      'unlockedAt': unlockedAt?.toIso8String(),
+      'unlockedAt': unlockedAt?.toIso8601String(),
     };
   }
 }

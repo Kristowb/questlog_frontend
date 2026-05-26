@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -36,12 +37,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               color: Colors.white,
               letterSpacing: 1.2,
             ),
-          ),
+          ).animate().fade(duration: 350.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 4),
           const Text(
             'Para petualang terkuat di dunia QuestLog.',
             style: TextStyle(color: Color(0xFFA099B0), fontSize: 12),
-          ),
+          ).animate().fade(duration: 350.ms, delay: 50.ms),
           const SizedBox(height: 16),
 
           Expanded(
@@ -56,14 +57,48 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       final isWarrior = item.classType == 'WARRIOR';
                       final classColor = isWarrior ? const Color(0xFFE94057) : const Color(0xFF00D4B2);
                       
-                      // Pangkat khusus untuk 3 besar
+                      // Rank Badge
                       Widget rankWidget;
+                      Color borderColor;
+                      double borderWidth = 1.0;
+                      List<BoxShadow>? shadows;
+                      
                       if (index == 0) {
                         rankWidget = const Icon(Icons.workspace_premium, color: Colors.amber, size: 28);
+                        borderColor = Colors.amber;
+                        borderWidth = 1.5;
+                        shadows = [
+                          BoxShadow(
+                            color: Colors.amber.withOpacity(0.12),
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 4),
+                          )
+                        ];
                       } else if (index == 1) {
-                        rankWidget = const Icon(Icons.workspace_premium, color: Colors.grey, size: 26);
+                        rankWidget = const Icon(Icons.workspace_premium, color: Color(0xFFC0C0C0), size: 26);
+                        borderColor = const Color(0xFFC0C0C0);
+                        borderWidth = 1.2;
+                        shadows = [
+                          BoxShadow(
+                            color: const Color(0xFFC0C0C0).withOpacity(0.08),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 3),
+                          )
+                        ];
                       } else if (index == 2) {
-                        rankWidget = const Icon(Icons.workspace_premium, color: Colors.brown, size: 24);
+                        rankWidget = const Icon(Icons.workspace_premium, color: Color(0xFFCD7F32), size: 24);
+                        borderColor = const Color(0xFFCD7F32);
+                        borderWidth = 1.2;
+                        shadows = [
+                          BoxShadow(
+                            color: const Color(0xFFCD7F32).withOpacity(0.08),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 3),
+                          )
+                        ];
                       } else {
                         rankWidget = Text(
                           '${index + 1}',
@@ -73,6 +108,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         );
+                        borderColor = item.isPremium ? Colors.amber.withOpacity(0.5) : const Color(0xFF1E1C2C);
+                        borderWidth = item.isPremium ? 1.5 : 1.0;
+                        if (item.isPremium) {
+                          shadows = [
+                            BoxShadow(
+                              color: Colors.amber.withOpacity(0.08),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 3),
+                            )
+                          ];
+                        }
                       }
 
                       return Container(
@@ -82,9 +129,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           color: const Color(0xFF0F0B1E),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: item.isPremium ? Colors.amber.withOpacity(0.3) : const Color(0xFF1E1C2C),
-                            width: item.isPremium ? 1.5 : 1.0,
+                            color: borderColor,
+                            width: borderWidth,
                           ),
+                          boxShadow: shadows,
                         ),
                         child: Row(
                           children: [
@@ -157,7 +205,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             ),
                           ],
                         ),
-                      );
+                      ).animate()
+                       .fade(duration: 300.ms, delay: (100 + index * 50).ms)
+                       .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad);
                     },
                   ),
           ),

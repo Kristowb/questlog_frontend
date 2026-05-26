@@ -51,7 +51,18 @@ factory User.fromJson(Map<String, dynamic> json) {
 }
 ```
 
-**Bypass Mock / Login OAuth** — Mendukung autentikasi menggunakan Google Sign-In asli serta opsi masuk instan (Bypass Mock) menggunakan nama kustom pahlawan untuk mempercepat siklus pengujian lokal.
+**Pemisahan Konfigurasi (Clean & DRY)** — Nilai-nilai penting seperti URL backend dan Client ID Google dipusatkan dalam kelas `AppConfig` agar tidak ada *hardcoding* di dalam widget UI.
+```dart
+final googleSignIn = GoogleSignIn(
+  scopes: ['email'],
+  serverClientId: AppConfig.googleClientId,
+);
+```
+
+**Networking (Dio & ApiClient)** — Menggunakan `ApiClient` terpusat berbasis `Dio` dengan interceptor untuk secara otomatis menyisipkan otorisasi token JWT (`Bearer <token>`) di setiap request ke backend.
+```dart
+final response = await _apiClient.dio.get('/users/${_currentUser!.id}');
+```
 
 ---
 
@@ -59,10 +70,11 @@ factory User.fromJson(Map<String, dynamic> json) {
 
 | Layer | Teknologi |
 |-------|-----------|
-| Runtime / SDK | Flutter SDK >= 3.10.4, Dart SDK |
+| Runtime / SDK | Flutter SDK >= 3.10.4 (Direkomendasikan >= 3.22.0), Dart SDK |
 | State Management | `provider` ^6.1.1 (ChangeNotifier) |
-| Networking | `http` ^1.2.0 |
+| Networking | `dio` ^5.4.3 (Menggantikan `http`) |
 | Authentication | `google_sign_in` ^6.2.1 |
+| UI Design & Anim | `google_fonts` ^6.2.1, `flutter_animate` ^4.5.0 |
 | UI Indicators | `percent_indicator` ^4.2.3 (Circular & Linear indicator) |
 | UI Charts | `fl_chart` ^0.66.0 (Grafik log latihan & diet) |
 | Utility | `url_launcher` ^6.2.5 (Pembukaan URL Stripe Checkout) |
