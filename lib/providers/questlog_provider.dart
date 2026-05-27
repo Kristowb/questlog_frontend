@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import '../config/app_config.dart';
 import '../models/user.dart';
 import '../models/quest.dart';
@@ -287,31 +287,69 @@ class QuestLogProvider with ChangeNotifier {
     }
   }
 
-  // Buy Premium (Redirect ke Stripe Checkout Session)
+  // Buy Premium (Stripe PaymentSheet Built-in Native Overlay)
   Future<bool> buyPremium() async {
     if (_currentUser == null) return false;
     _setLoading(true);
+    _errorMessage = null;
     try {
+      // 1. Dapatkan PaymentIntent dari backend
       final response = await _apiClient.dio.post(
-        '/premium/checkout',
+        '/premium/payment-intent',
         data: {'userId': _currentUser!.id},
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = response.data;
-        final String checkoutUrl = data['checkoutUrl'];
-        
-        final Uri url = Uri.parse(checkoutUrl);
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
+        final String clientSecret = data['paymentIntentClientSecret'];
+        final String publishableKey = data['publishableKey'];
+
+        // 2. Inisialisasi Stripe SDK
+        Stripe.publishableKey = publishableKey;
+        await Stripe.instance.applySettings();
+
+        // 3. Inisialisasi PaymentSheet
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: clientSecret,
+            merchantDisplayName: 'QuestLog RPG',
+            style: ThemeMode.dark,
+          ),
+        );
+
+        // 4. Tampilkan PaymentSheet asli di aplikasi
+        await Stripe.instance.presentPaymentSheet();
+
+        // 5. Ekstrak PaymentIntent ID dari clientSecret untuk verifikasi server-side
+        final String paymentIntentId = clientSecret.split('_secret_').first;
+
+        // 6. Konfirmasi pembayaran ke backend secara aman
+        final confirmResponse = await _apiClient.dio.post(
+          '/premium/confirm-payment',
+          data: {
+            'userId': _currentUser!.id,
+            'paymentIntentId': paymentIntentId,
+          },
+        );
+
+        if (confirmResponse.statusCode == 200) {
+          _currentUser = User.fromJson(confirmResponse.data);
+          notifyListeners();
+          await refreshAllData();
           _setLoading(false);
           return true;
         } else {
-          _errorMessage = 'Tidak dapat membuka browser untuk pembayaran.';
+          _errorMessage = 'Gagal mengonfirmasi status premium di server.';
         }
+      } else {
+        _errorMessage = 'Gagal membuat sesi pembayaran di server.';
       }
     } catch (e) {
-      _errorMessage = 'Kesalahan integrasi Stripe: $e';
+      if (e is StripeException) {
+        _errorMessage = 'Pembayaran dibatalkan atau gagal: ${e.error.localizedMessage}';
+      } else {
+        _errorMessage = 'Kesalahan integrasi Stripe: $e';
+      }
     }
     _setLoading(false);
     return false;

@@ -175,12 +175,21 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     onPressed: provider.isLoading
                         ? null
                         : () async {
+                            final scaffoldMessenger = ScaffoldMessenger.of(context);
                             bool success = await provider.buyPremium();
-                            if (success && mounted) {
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
+                            if (!context.mounted) return;
+                            if (success) {
+                              scaffoldMessenger.showSnackBar(
                                 const SnackBar(
-                                  content: Text('Membuka browser Stripe Checkout...'),
+                                  backgroundColor: Colors.green,
+                                  content: Text('Selamat! Akun Anda sekarang menjadi Premium Adventurer.'),
+                                ),
+                              );
+                            } else if (provider.errorMessage != null) {
+                              scaffoldMessenger.showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.red,
+                                  content: Text(provider.errorMessage!),
                                 ),
                               );
                             }
