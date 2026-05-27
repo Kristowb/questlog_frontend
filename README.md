@@ -113,7 +113,27 @@ Future<Response> fetchUserData() async {
 | UI Design & Anim | `google_fonts` ^6.2.1, `flutter_animate` ^4.5.0 |
 | UI Indicators | `percent_indicator` ^4.2.3 (Circular & Linear indicator) |
 | UI Charts | `fl_chart` ^0.66.0 (Grafik log latihan & diet) |
-| Utility | `url_launcher` ^6.2.5 (Pembukaan URL Stripe Checkout) |
+| Payment Gateway | `flutter_stripe` ^10.1.1 (Integrasi Stripe PaymentSheet native) |
+| Utility | `url_launcher` ^6.2.5 (Pembukaan URL eksternal) |
+
+---
+
+## Integrasi Stripe (Built-In Payment Sheet)
+
+Aplikasi ini menggunakan **Stripe PaymentSheet** asli untuk memproses transaksi pembelian premium langsung di dalam aplikasi (buka di overlay, bukan redirect ke browser).
+
+### Persyaratan Platform Android
+
+Guna memastikan modal PaymentSheet dapat berjalan dengan aman dan lancar di Android, konfigurasi berikut harus tetap dipertahankan:
+
+1. **MainActivity Mewarisi `FlutterFragmentActivity`**:
+   Berkas `android/app/src/main/kotlin/com/questlog/questlog_frontend/MainActivity.kt` wajib mewarisi `FlutterFragmentActivity` (bukan `FlutterActivity` standar) untuk mendukung alur otentikasi keamanan 3D Secure / Biometrik dari Stripe SDK.
+2. **Kesesuaian Tema Android (AppCompat / Material)**:
+   Seluruh berkas gaya Android (`styles.xml`) pada direktori `android/app/src/main/res/` (termasuk folder `values`, `values-night`, `values-v31`, dan `values-night-v31`) wajib menggunakan parent tema **`Theme.MaterialComponents`** atau **`Theme.AppCompat`**:
+   * *Contoh*: `<style name="NormalTheme" parent="Theme.MaterialComponents.Light.NoActionBar">`
+3. **Konfigurasi SDK & Gradle**:
+   * `minSdk` diatur minimal **21** di dalam `android/app/build.gradle.kts`.
+   * Dependensi `androidx.appcompat` dan `com.google.android.material` harus dideklarasikan secara eksplisit di dalam blok `dependencies` gradle.
 
 ---
 
