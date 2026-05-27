@@ -175,10 +175,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     onPressed: provider.isLoading
                         ? null
                         : () async {
+                            debugPrint('[PremiumScreen] Tombol "Aktifkan Pro Adventurer" diklik. Memulai proses pembayaran...');
                             final scaffoldMessenger = ScaffoldMessenger.of(context);
                             bool success = await provider.buyPremium();
-                            if (!context.mounted) return;
+                            if (!context.mounted) {
+                              debugPrint('[PremiumScreen] Konteks widget sudah tidak aktif (unmounted) setelah buyPremium().');
+                              return;
+                            }
                             if (success) {
+                              debugPrint('[PremiumScreen] Pembayaran berhasil diproses dan dikonfirmasi!');
                               scaffoldMessenger.showSnackBar(
                                 const SnackBar(
                                   backgroundColor: Colors.green,
@@ -186,12 +191,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 ),
                               );
                             } else if (provider.errorMessage != null) {
+                              debugPrint('[PremiumScreen] Pembayaran gagal. Pesan error: ${provider.errorMessage}');
                               scaffoldMessenger.showSnackBar(
                                 SnackBar(
                                   backgroundColor: Colors.red,
                                   content: Text(provider.errorMessage!),
                                 ),
                               );
+                            } else {
+                              debugPrint('[PremiumScreen] Pembayaran gagal tanpa pesan error spesifik.');
                             }
                           },
                     style: ElevatedButton.styleFrom(

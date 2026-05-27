@@ -294,6 +294,7 @@ class QuestLogProvider with ChangeNotifier {
     _errorMessage = null;
     try {
       // 1. Dapatkan PaymentIntent dari backend
+      debugPrint('[QuestLogProvider] Mengambil PaymentIntent untuk user ID: ${_currentUser!.id}...');
       final response = await _apiClient.dio.post(
         '/premium/payment-intent',
         data: {'userId': _currentUser!.id},
@@ -303,12 +304,15 @@ class QuestLogProvider with ChangeNotifier {
         final Map<String, dynamic> data = response.data;
         final String clientSecret = data['paymentIntentClientSecret'];
         final String publishableKey = data['publishableKey'];
+        debugPrint('[QuestLogProvider] Sukses mendapatkan PaymentIntent. clientSecret: $clientSecret, publishableKey: $publishableKey');
 
         // 2. Inisialisasi Stripe SDK
+        debugPrint('[QuestLogProvider] Menginisialisasi Stripe SDK...');
         Stripe.publishableKey = publishableKey;
         await Stripe.instance.applySettings();
 
         // 3. Inisialisasi PaymentSheet
+        debugPrint('[QuestLogProvider] Menginisialisasi PaymentSheet...');
         await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: clientSecret,
@@ -316,14 +320,18 @@ class QuestLogProvider with ChangeNotifier {
             style: ThemeMode.dark,
           ),
         );
+        debugPrint('[QuestLogProvider] Sukses menginisialisasi PaymentSheet.');
 
         // 4. Tampilkan PaymentSheet asli di aplikasi
+        debugPrint('[QuestLogProvider] Menampilkan PaymentSheet...');
         await Stripe.instance.presentPaymentSheet();
+        debugPrint('[QuestLogProvider] Pengguna menyelesaikan alur input di PaymentSheet.');
 
         // 5. Ekstrak PaymentIntent ID dari clientSecret untuk verifikasi server-side
         final String paymentIntentId = clientSecret.split('_secret_').first;
 
         // 6. Konfirmasi pembayaran ke backend secara aman
+        debugPrint('[QuestLogProvider] Mengirim konfirmasi pembayaran ke server untuk PaymentIntentID: $paymentIntentId...');
         final confirmResponse = await _apiClient.dio.post(
           '/premium/confirm-payment',
           data: {
@@ -336,19 +344,24 @@ class QuestLogProvider with ChangeNotifier {
           _currentUser = User.fromJson(confirmResponse.data);
           notifyListeners();
           await refreshAllData();
+          debugPrint('[QuestLogProvider] Pembayaran berhasil dikonfirmasi oleh backend. Status premium aktif!');
           _setLoading(false);
           return true;
         } else {
           _errorMessage = 'Gagal mengonfirmasi status premium di server.';
+          debugPrint('[QuestLogProvider] Gagal mengonfirmasi pembayaran di server. Kode status: ${confirmResponse.statusCode}');
         }
       } else {
         _errorMessage = 'Gagal membuat sesi pembayaran di server.';
+        debugPrint('[QuestLogProvider] Gagal mengambil PaymentIntent. Kode status: ${response.statusCode}');
       }
     } catch (e) {
       if (e is StripeException) {
         _errorMessage = 'Pembayaran dibatalkan atau gagal: ${e.error.localizedMessage}';
+        debugPrint('[QuestLogProvider] StripeException terjadi: ${e.error.localizedMessage} (Code: ${e.error.code}, Decls: ${e.error.stripeErrorCode})');
       } else {
         _errorMessage = 'Kesalahan integrasi Stripe: $e';
+        debugPrint('[QuestLogProvider] Exception integrasi Stripe terjadi: $e');
       }
     }
     _setLoading(false);
