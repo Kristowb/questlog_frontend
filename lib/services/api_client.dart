@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiClient {
   late final Dio dio;
@@ -27,7 +28,7 @@ class ApiClient {
           return handler.next(options);
         },
         onError: (DioException e, handler) {
-          print('API Error [${e.response?.statusCode}]: ${e.message}');
+          debugPrint('API Error [${e.response?.statusCode}]: ${e.message}');
           return handler.next(e);
         },
       ),

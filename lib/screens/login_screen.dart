@@ -8,7 +8,7 @@ import 'class_selection_screen.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   void _handleLoginSuccess(BuildContext context, QuestLogProvider provider) {
     if (provider.currentUser?.classType == null) {
@@ -59,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFE94057).withOpacity(0.5),
+                          color: const Color(0xFFE94057).withValues(alpha: 0.5),
                           blurRadius: 20,
                           spreadRadius: 2,
                         ),
@@ -145,14 +145,16 @@ class LoginScreen extends StatelessWidget {
                                       if (success && context.mounted) {
                                         _handleLoginSuccess(context, provider);
                                       }
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(content: Text('Gagal mendapatkan ID Token Google.')),
                                       );
+                                      }
                                     }
                                   }
                                 } catch (e) {
-                                  print('Google Sign-In Error: $e');
+                                  debugPrint('Google Sign-In Error: $e');
+                                  if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('Google SDK Gagal: $e'),
@@ -234,7 +236,7 @@ class LoginScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -249,7 +251,7 @@ class LoginScreen extends StatelessWidget {
 // Vector Google Logo Custom Painter
 class GoogleLogo extends StatelessWidget {
   final double size;
-  const GoogleLogo({Key? key, this.size = 24}) : super(key: key);
+  const GoogleLogo({super.key, this.size = 24});
 
   @override
   Widget build(BuildContext context) {
@@ -316,7 +318,7 @@ class _GoogleLogoPainter extends CustomPainter {
 // Vector Twitter/X Logo Custom Painter
 class TwitterXLogo extends StatelessWidget {
   final double size;
-  const TwitterXLogo({Key? key, this.size = 24}) : super(key: key);
+  const TwitterXLogo({super.key, this.size = 24});
 
   @override
   Widget build(BuildContext context) {

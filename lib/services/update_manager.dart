@@ -108,8 +108,8 @@ class UpdateManager {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async => false, // Mencegah ditutup dengan tombol back
+        return PopScope(
+          canPop: false, // Mencegah ditutup dengan tombol back
           child: Dialog(
             backgroundColor: Colors.transparent,
             insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -124,10 +124,10 @@ class UpdateManager {
                   ],
                 ),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFE94057).withOpacity(0.5), width: 1.5),
+                border: Border.all(color: const Color(0xFFE94057).withValues(alpha: 0.5), width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFE94057).withOpacity(0.15),
+                    color: const Color(0xFFE94057).withValues(alpha: 0.15),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
@@ -142,7 +142,7 @@ class UpdateManager {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE94057).withOpacity(0.1),
+                        color: const Color(0xFFE94057).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0xFFE94057), width: 1.5),
                       ),
@@ -265,7 +265,7 @@ class UpdateManager {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFE94057).withOpacity(0.3),
+                                  color: const Color(0xFFE94057).withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -313,7 +313,7 @@ class UpdateManager {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color, width: 1),
       ),
@@ -344,6 +344,7 @@ class UpdateManager {
 
   /// Menjalankan proses pengunduhan OTA APK dan menampilkan Progress Dialog
   static void _startDownload(BuildContext context, String url) {
+    final navigatorContext = context;
     final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0.0);
     final ValueNotifier<String> statusNotifier = ValueNotifier<String>('Memulai unduhan...');
 
@@ -351,8 +352,8 @@ class UpdateManager {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async => false, // Jangan biarkan menutup secara paksa
+        return PopScope(
+          canPop: false, // Jangan biarkan menutup secara paksa
           child: Dialog(
             backgroundColor: Colors.transparent,
             child: Container(
@@ -442,29 +443,37 @@ class UpdateManager {
             case OtaStatus.INSTALLING:
               statusNotifier.value = 'Membuka instalatur APK rilis...';
               Future.delayed(const Duration(seconds: 1), () {
-                if (context.mounted) {
-                  Navigator.pop(context); // Tutup dialog progress
+                if (navigatorContext.mounted) {
+                  Navigator.pop(navigatorContext); // Tutup dialog progress
                 }
               });
               break;
             case OtaStatus.PERMISSION_NOT_GRANTED_ERROR:
-              if (context.mounted) Navigator.pop(context);
-              _showSnackBar(context, 'Izin instalasi APK tidak diberikan.');
+              if (navigatorContext.mounted) {
+                Navigator.pop(navigatorContext);
+                _showSnackBar(navigatorContext, 'Izin instalasi APK tidak diberikan.');
+              }
               break;
             case OtaStatus.DOWNLOAD_ERROR:
-              if (context.mounted) Navigator.pop(context);
-              _showSnackBar(context, 'Gagal mengunduh berkas APK. Silakan periksa koneksi internet Anda.');
+              if (navigatorContext.mounted) {
+                Navigator.pop(navigatorContext);
+                _showSnackBar(navigatorContext, 'Gagal mengunduh berkas APK. Silakan periksa koneksi internet Anda.');
+              }
               break;
             case OtaStatus.INTERNAL_ERROR:
             default:
-              if (context.mounted) Navigator.pop(context);
-              _showSnackBar(context, 'Terjadi kesalahan sistem internal: ${event.value}');
+              if (navigatorContext.mounted) {
+                Navigator.pop(navigatorContext);
+                _showSnackBar(navigatorContext, 'Terjadi kesalahan sistem internal: ${event.value}');
+              }
               break;
           }
         },
         onError: (err) {
-          if (context.mounted) Navigator.pop(context);
-          _showSnackBar(context, 'Gagal melakukan instalasi OTA: $err');
+          if (navigatorContext.mounted) {
+            Navigator.pop(navigatorContext);
+            _showSnackBar(navigatorContext, 'Gagal melakukan instalasi OTA: $err');
+          }
         },
       );
     } catch (e) {

@@ -15,7 +15,7 @@ void main() {
 }
 
 class QuestLogApp extends StatelessWidget {
-  const QuestLogApp({Key? key}) : super(key: key);
+  const QuestLogApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,6 @@ class QuestLogApp extends StatelessWidget {
           primary: Color(0xFF00D4B2),
           secondary: Color(0xFFE94057),
           surface: Color(0xFF0F0B1E),
-          background: Color(0xFF07050E),
         ),
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontFamily: 'Outfit', fontWeight: FontWeight.bold),

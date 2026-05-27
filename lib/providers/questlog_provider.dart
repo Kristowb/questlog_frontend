@@ -111,7 +111,7 @@ class QuestLogProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Gagal refresh profil: $e');
+      debugPrint('Gagal refresh profil: $e');
     }
   }
 
@@ -128,7 +128,7 @@ class QuestLogProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Gagal mengambil quest harian: $e');
+      debugPrint('Gagal mengambil quest harian: $e');
     }
   }
 
@@ -166,7 +166,7 @@ class QuestLogProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Gagal mengambil latihan harian: $e');
+      debugPrint('Gagal mengambil latihan harian: $e');
     }
   }
 
@@ -216,7 +216,7 @@ class QuestLogProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Gagal mengambil data diet harian: $e');
+      debugPrint('Gagal mengambil data diet harian: $e');
     }
   }
 
@@ -266,7 +266,7 @@ class QuestLogProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Gagal mengambil leaderboard: $e');
+      debugPrint('Gagal mengambil leaderboard: $e');
     }
   }
 
@@ -283,7 +283,7 @@ class QuestLogProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Gagal mengambil pencapaian pahlawan: $e');
+      debugPrint('Gagal mengambil pencapaian pahlawan: $e');
     }
   }
 

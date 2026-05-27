@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({Key? key}) : super(key: key);
+  const LeaderboardScreen({super.key});
 
   @override
   State<LeaderboardScreen> createState() => _LeaderboardScreenState();
@@ -69,7 +69,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         borderWidth = 1.5;
                         shadows = [
                           BoxShadow(
-                            color: Colors.amber.withOpacity(0.12),
+                            color: Colors.amber.withValues(alpha: 0.12),
                             blurRadius: 10,
                             spreadRadius: 1,
                             offset: const Offset(0, 4),
@@ -81,7 +81,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         borderWidth = 1.2;
                         shadows = [
                           BoxShadow(
-                            color: const Color(0xFFC0C0C0).withOpacity(0.08),
+                            color: const Color(0xFFC0C0C0).withValues(alpha: 0.08),
                             blurRadius: 8,
                             spreadRadius: 1,
                             offset: const Offset(0, 3),
@@ -93,7 +93,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         borderWidth = 1.2;
                         shadows = [
                           BoxShadow(
-                            color: const Color(0xFFCD7F32).withOpacity(0.08),
+                            color: const Color(0xFFCD7F32).withValues(alpha: 0.08),
                             blurRadius: 8,
                             spreadRadius: 1,
                             offset: const Offset(0, 3),
@@ -108,12 +108,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         );
-                        borderColor = item.isPremium ? Colors.amber.withOpacity(0.5) : const Color(0xFF1E1C2C);
+                        borderColor = item.isPremium ? Colors.amber.withValues(alpha: 0.5) : const Color(0xFF1E1C2C);
                         borderWidth = item.isPremium ? 1.5 : 1.0;
                         if (item.isPremium) {
                           shadows = [
                             BoxShadow(
-                              color: Colors.amber.withOpacity(0.08),
+                              color: Colors.amber.withValues(alpha: 0.08),
                               blurRadius: 8,
                               spreadRadius: 1,
                               offset: const Offset(0, 3),
@@ -146,7 +146,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: classColor.withOpacity(0.1),
+                                color: classColor.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(

@@ -5,7 +5,7 @@ import '../providers/questlog_provider.dart';
 import 'home_screen.dart';
 
 class ClassSelectionScreen extends StatefulWidget {
-  const ClassSelectionScreen({Key? key}) : super(key: key);
+  const ClassSelectionScreen({super.key});
 
   @override
   State<ClassSelectionScreen> createState() => _ClassSelectionScreenState();
@@ -108,6 +108,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
                       : () async {
                           bool success = await provider.chooseClass(_selectedClass!);
                           if (success && mounted) {
+                            if (!context.mounted) return;
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -126,8 +127,8 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
                     ),
                     elevation: 5,
                     shadowColor: _selectedClass == 'WARRIOR' 
-                        ? const Color(0xFFE94057).withOpacity(0.5) 
-                        : const Color(0xFF00D4B2).withOpacity(0.5),
+                        ? const Color(0xFFE94057).withValues(alpha: 0.5) 
+                        : const Color(0xFF00D4B2).withValues(alpha: 0.5),
                   ),
                   child: provider.isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
@@ -178,7 +179,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: accentColor.withOpacity(0.35),
+                    color: accentColor.withValues(alpha: 0.35),
                     blurRadius: 20,
                     spreadRadius: 2,
                     offset: const Offset(0, 4),
@@ -193,7 +194,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.1),
+                color: accentColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: accentColor, size: 30),
@@ -258,7 +259,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

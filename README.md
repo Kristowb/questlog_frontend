@@ -24,34 +24,67 @@ Widget Rebuild ←----------- Notifikasi Perubahan ←--------- JSON Parsing
 
 ## Konvensi Kode
 
-**State Binding & UI Sync** — Menggunakan `Provider.of` untuk akses data dan pemicu aksi di dalam UI. Sinkronisasi data di-refresh secara otomatis setelah aksi penyelesaian quest, penambahan latihan, atau pencatatan diet.
+**State Binding & UI Sync** — Menggunakan `context.watch` untuk mendengarkan perubahan data, dan `context.read` untuk memicu aksi di dalam UI agar terhindar dari peringatan linting. Sinkronisasi data di-refresh secara otomatis setelah aksi penyelesaian quest, penambahan latihan, atau pencatatan diet.
+
 ```dart
-final provider = Provider.of<QuestLogProvider>(context);
+// Mendengarkan perubahan data di dalam build method
+final provider = context.watch<QuestLogProvider>();
 final user = provider.currentUser;
 
-// Menjalankan aksi
-await provider.completeQuest(quest.id);
+// Menjalankan aksi asinkron di dalam event handler
+void _onCompleteQuest(BuildContext context, String questId) async {
+  final provider = context.read<QuestLogProvider>();
+  await provider.completeQuest(questId);
+}
 ```
 
-**JSON Serialization** — Pemetaan data menggunakan model yang tangguh dengan validasi nilai fallback/default untuk mencegah kegagalan runtime (null safety).
+**JSON Serialization** — Pemetaan data menggunakan model yang tangguh di dalam kelas model dengan validasi nilai fallback/default untuk mencegah kegagalan runtime (null safety).
+
 ```dart
-factory User.fromJson(Map<String, dynamic> json) {
-  return User(
-    id: json['id'],
-    email: json['email'] ?? '',
-    name: json['name'] ?? '',
-    classType: json['classType'],
-    level: json['level'] ?? 1,
-    strengthXp: json['strengthXp'] ?? 0,
-    vitalityXp: json['vitalityXp'] ?? 0,
-    xpToNextLevel: json['xpToNextLevel'] ?? 100,
-    coins: json['coins'] ?? 0,
-    isPremium: json['isPremium'] ?? false,
-  );
+class User {
+  final String id;
+  final String email;
+  final String name;
+  final String? classType;
+  final int level;
+  final int strengthXp;
+  final int vitalityXp;
+  final int xpToNextLevel;
+  final int coins;
+  final bool isPremium;
+
+  User({
+    required this.id,
+    required this.email,
+    required this.name,
+    this.classType,
+    required this.level,
+    required this.strengthXp,
+    required this.vitalityXp,
+    required this.xpToNextLevel,
+    required this.coins,
+    required this.isPremium,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] ?? '',
+      email: json['email'] ?? '',
+      name: json['name'] ?? '',
+      classType: json['classType'],
+      level: json['level'] ?? 1,
+      strengthXp: json['strengthXp'] ?? 0,
+      vitalityXp: json['vitalityXp'] ?? 0,
+      xpToNextLevel: json['xpToNextLevel'] ?? 100,
+      coins: json['coins'] ?? 0,
+      isPremium: json['isPremium'] ?? false,
+    );
+  }
 }
 ```
 
 **Pemisahan Konfigurasi (Clean & DRY)** — Nilai-nilai penting seperti URL backend dan Client ID Google dipusatkan dalam kelas `AppConfig` agar tidak ada *hardcoding* di dalam widget UI.
+
 ```dart
 final googleSignIn = GoogleSignIn(
   scopes: ['email'],
@@ -60,8 +93,11 @@ final googleSignIn = GoogleSignIn(
 ```
 
 **Networking (Dio & ApiClient)** — Menggunakan `ApiClient` terpusat berbasis `Dio` dengan interceptor untuk secara otomatis menyisipkan otorisasi token JWT (`Bearer <token>`) di setiap request ke backend.
+
 ```dart
-final response = await _apiClient.dio.get('/users/${_currentUser!.id}');
+Future<Response> fetchUserData() async {
+  return await _apiClient.dio.get('/users/${_currentUser!.id}');
+}
 ```
 
 ---
@@ -84,25 +120,41 @@ final response = await _apiClient.dio.get('/users/${_currentUser!.id}');
 ## Panduan Memulai
 
 ### 1. Prasyarat
+
 Pastikan Anda telah menginstal Flutter SDK terbaru di mesin Anda. Jalankan perintah berikut untuk memverifikasi kesiapan lingkungan:
+
 ```bash
 flutter doctor
 ```
 
 ### 2. Konfigurasi Endpoint Backend
+
 Pada halaman login (`login_screen.dart`), terdapat input konfigurasi URL Backend Server.
+
 - Gunakan `http://localhost:8080/api/v1` jika menjalankan aplikasi di browser/desktop/simulator Windows.
 - Gunakan `http://10.0.2.2:8080/api/v1` jika menjalankan aplikasi di Android Emulator.
 - Gunakan IP lokal mesin Anda (misal `http://192.168.1.x:8080/api/v1`) jika menggunakan perangkat fisik.
 
 ### 3. Mengambil Dependency
+
 Jalankan perintah berikut untuk mengunduh semua package dependency yang terdaftar:
+
 ```bash
 flutter pub get
 ```
 
-### 4. Menjalankan Aplikasi
+### 4. Analisis Kode (Linter)
+
+Proyek ini mempertahankan standar kualitas kode yang sangat ketat dan bebas dari semua peringatan linter (*lint warning-free*). Sebelum melakukan commit, selalu jalankan analisis statis untuk memastikan kualitas kode tetap terjaga:
+
+```bash
+flutter analyze
+```
+
+### 5. Menjalankan Aplikasi
+
 Pilih perangkat target Anda (Emulator Android, iOS, Chrome, atau Windows) dan jalankan:
+
 ```bash
 flutter run
 ```

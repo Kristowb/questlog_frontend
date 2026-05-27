@@ -5,7 +5,7 @@ import '../providers/questlog_provider.dart';
 import '../models/achievement.dart';
 
 class AchievementsScreen extends StatelessWidget {
-  const AchievementsScreen({Key? key}) : super(key: key);
+  const AchievementsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class AchievementsScreen extends StatelessWidget {
   }
 
   Widget _buildAchievementCard(Achievement ach, Color classColor) {
-    final Color cardBg = ach.isUnlocked ? const Color(0xFF0F0B1E) : const Color(0xFF131120).withOpacity(0.5);
+    final Color cardBg = ach.isUnlocked ? const Color(0xFF0F0B1E) : const Color(0xFF131120).withValues(alpha: 0.5);
     final Color borderColor = ach.isUnlocked ? const Color(0xFF2D2A42) : const Color(0xFF1E1C2C);
     final double opacity = ach.isUnlocked ? 1.0 : 0.4;
 
@@ -87,13 +87,13 @@ class AchievementsScreen extends StatelessWidget {
         color: cardBg,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: ach.isUnlocked ? classColor.withOpacity(0.5) : borderColor,
+          color: ach.isUnlocked ? classColor.withValues(alpha: 0.5) : borderColor,
           width: ach.isUnlocked ? 1.5 : 1.0,
         ),
         boxShadow: ach.isUnlocked
             ? [
                 BoxShadow(
-                  color: classColor.withOpacity(0.15),
+                  color: classColor.withValues(alpha: 0.15),
                   blurRadius: 12,
                   spreadRadius: 1,
                   offset: const Offset(0, 4),
@@ -108,7 +108,7 @@ class AchievementsScreen extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: ach.isUnlocked ? classColor.withOpacity(0.12) : const Color(0xFF1E1C2C),
+              color: ach.isUnlocked ? classColor.withValues(alpha: 0.12) : const Color(0xFF1E1C2C),
               shape: BoxShape.circle,
               border: Border.all(
                 color: ach.isUnlocked ? classColor : const Color(0xFF2D2A42),
@@ -134,14 +134,14 @@ class AchievementsScreen extends StatelessWidget {
                           fontFamily: 'Outfit',
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
-                          color: Colors.white.withOpacity(opacity),
+                          color: Colors.white.withValues(alpha: opacity),
                         ),
                       ),
                     ),
                     if (ach.isUnlocked) ...[
                       const Icon(Icons.check_circle, color: Colors.green, size: 18),
                     ] else ...[
-                      Icon(Icons.lock, color: const Color(0xFFA099B0).withOpacity(0.5), size: 16),
+                      Icon(Icons.lock, color: const Color(0xFFA099B0).withValues(alpha: 0.5), size: 16),
                     ]
                   ],
                 ),
@@ -151,7 +151,7 @@ class AchievementsScreen extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 12,
-                    color: const Color(0xFFA099B0).withOpacity(opacity),
+                    color: const Color(0xFFA099B0).withValues(alpha: opacity),
                   ),
                 ),
                 if (ach.isUnlocked && ach.unlockedAt != null) ...[
@@ -162,7 +162,7 @@ class AchievementsScreen extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: classColor.withOpacity(0.7),
+                      color: classColor.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -196,14 +196,14 @@ class AchievementsScreen extends StatelessWidget {
         assetPath,
         width: 32,
         height: 32,
-        color: opacity < 1.0 ? Colors.white.withOpacity(0.3) : null,
+        color: opacity < 1.0 ? Colors.white.withValues(alpha: 0.3) : null,
         colorBlendMode: opacity < 1.0 ? BlendMode.modulate : null,
         errorBuilder: (context, error, stackTrace) {
           return Text(
             iconEmoji,
             style: TextStyle(
               fontSize: 28,
-              color: Colors.white.withOpacity(opacity),
+              color: Colors.white.withValues(alpha: opacity),
             ),
           );
         },
@@ -214,7 +214,7 @@ class AchievementsScreen extends StatelessWidget {
       iconEmoji,
       style: TextStyle(
         fontSize: 28,
-        color: Colors.white.withOpacity(opacity),
+        color: Colors.white.withValues(alpha: opacity),
       ),
     );
   }

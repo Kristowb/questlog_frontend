@@ -13,7 +13,7 @@ import 'login_screen.dart';
 import 'achievements_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: classColor.withOpacity(0.1),
+                        color: classColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(color: classColor, width: 2),
                       ),
@@ -279,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
-                        color: classColor.withOpacity(0.15),
+                        color: classColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: classColor),
                       ),
@@ -553,7 +553,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${current.toStringAsFixed(0)}',
+                current.toStringAsFixed(0),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -601,14 +601,14 @@ class _HomeScreenState extends State<HomeScreen> {
         color: const Color(0xFF0F0B1E),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: quest.isCompleted ? questColor.withOpacity(0.3) : const Color(0xFF1E1C2C),
+          color: quest.isCompleted ? questColor.withValues(alpha: 0.3) : const Color(0xFF1E1C2C),
         ),
       ),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: questColor.withOpacity(0.1),
+            color: questColor.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -636,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: quest.isCompleted ? Colors.transparent : questColor.withOpacity(0.15),
+            color: quest.isCompleted ? Colors.transparent : questColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: quest.isCompleted ? Colors.transparent : questColor,

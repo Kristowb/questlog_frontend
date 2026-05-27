@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class PremiumScreen extends StatefulWidget {
-  const PremiumScreen({Key? key}) : super(key: key);
+  const PremiumScreen({super.key});
 
   @override
   State<PremiumScreen> createState() => _PremiumScreenState();
@@ -33,10 +33,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.amber.withOpacity(0.1),
+              color: Colors.amber.withValues(alpha: 0.1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.amber.withOpacity(0.2),
+                  color: Colors.amber.withValues(alpha: 0.2),
                   blurRadius: 30,
                   spreadRadius: 2,
                 ),
@@ -63,7 +63,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           const SizedBox(height: 8),
           const Text(
             'Buka kekuatan penuh pahlawan Anda selamanya.',
-            style: TextStyle(color: const Color(0xFFA099B0), fontSize: 13),
+            style: TextStyle(color: Color(0xFFA099B0), fontSize: 13),
             textAlign: TextAlign.center,
           ).animate().fade(duration: 400.ms, delay: 100.ms),
           const SizedBox(height: 28),
@@ -78,7 +78,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 border: Border.all(color: Colors.amber, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.amber.withOpacity(0.1),
+                    color: Colors.amber.withValues(alpha: 0.1),
                     blurRadius: 15,
                     spreadRadius: 1,
                   )
@@ -101,7 +101,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   const Text(
                     'Selamat! Anda telah mengaktifkan Pro Adventurer Pack. Fitur analitik daging & penjadwalan latihan otomatis telah terbuka.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: const Color(0xFFA099B0), fontSize: 12),
+                    style: TextStyle(color: Color(0xFFA099B0), fontSize: 12),
                   ),
                   const SizedBox(height: 20),
                   // Premium advanced feature (simulasi)
@@ -177,6 +177,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         : () async {
                             bool success = await provider.buyPremium();
                             if (success && mounted) {
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Membuka browser Stripe Checkout...'),
@@ -190,7 +191,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       minimumSize: const Size(double.infinity, 54),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 5,
-                      shadowColor: Colors.amber.withOpacity(0.3),
+                      shadowColor: Colors.amber.withValues(alpha: 0.3),
                     ),
                     child: provider.isLoading
                         ? const CircularProgressIndicator(color: Colors.black)
@@ -222,7 +223,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
+              color: Colors.amber.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: Colors.amber, size: 22),

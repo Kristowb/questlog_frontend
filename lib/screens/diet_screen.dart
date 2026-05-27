@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class DietScreen extends StatefulWidget {
-  const DietScreen({Key? key}) : super(key: key);
+  const DietScreen({super.key});
 
   @override
   State<DietScreen> createState() => _DietScreenState();
@@ -66,7 +66,7 @@ class _DietScreenState extends State<DietScreen> {
       labelStyle: TextStyle(color: const Color(0xFFA099B0), fontSize: labelFontSize),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       filled: true,
-      fillColor: const Color(0xFF1E1C2C).withOpacity(0.3),
+      fillColor: const Color(0xFF1E1C2C).withValues(alpha: 0.3),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFF2D2A42)),
@@ -218,6 +218,7 @@ class _DietScreenState extends State<DietScreen> {
                                 _carbsController.clear();
                                 _fatController.clear();
                                 _caloriesController.clear();
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     backgroundColor: Color(0xFF00D4B2),
@@ -233,7 +234,7 @@ class _DietScreenState extends State<DietScreen> {
                       minimumSize: const Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 4,
-                      shadowColor: const Color(0xFF00D4B2).withOpacity(0.3),
+                      shadowColor: const Color(0xFF00D4B2).withValues(alpha: 0.3),
                     ),
                     child: provider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
@@ -305,7 +306,7 @@ class _DietScreenState extends State<DietScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00D4B2).withOpacity(0.15),
+                                color: const Color(0xFF00D4B2).withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(

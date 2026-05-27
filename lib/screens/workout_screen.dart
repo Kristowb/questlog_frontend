@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 
 class WorkoutScreen extends StatefulWidget {
-  const WorkoutScreen({Key? key}) : super(key: key);
+  const WorkoutScreen({super.key});
 
   @override
   State<WorkoutScreen> createState() => _WorkoutScreenState();
@@ -23,7 +23,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       labelStyle: TextStyle(color: const Color(0xFFA099B0), fontSize: labelFontSize),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       filled: true,
-      fillColor: const Color(0xFF1E1C2C).withOpacity(0.3),
+      fillColor: const Color(0xFF1E1C2C).withValues(alpha: 0.3),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFF2D2A42)),
@@ -136,6 +136,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                                 _setsController.clear();
                                 _repsController.clear();
                                 _weightController.clear();
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     backgroundColor: Color(0xFFE94057),
@@ -151,7 +152,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       minimumSize: const Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 4,
-                      shadowColor: const Color(0xFFE94057).withOpacity(0.3),
+                      shadowColor: const Color(0xFFE94057).withValues(alpha: 0.3),
                     ),
                     child: provider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
@@ -223,7 +224,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE94057).withOpacity(0.15),
+                                color: const Color(0xFFE94057).withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
