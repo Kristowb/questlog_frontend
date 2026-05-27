@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'toast_service.dart';
 
 class UpdateManager {
   static const String _githubReleaseUrl =
@@ -483,16 +484,6 @@ class UpdateManager {
   }
 
   static void _showSnackBar(BuildContext context, String message) {
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: const TextStyle(fontFamily: 'Inter'),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    QuestLogToast.showError(context, message);
   }
 }

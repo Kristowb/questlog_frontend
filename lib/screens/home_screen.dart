@@ -4,6 +4,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
 import '../services/update_manager.dart';
+import '../services/toast_service.dart';
 import '../models/quest.dart';
 import 'workout_screen.dart';
 import 'diet_screen.dart';
@@ -648,11 +649,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () async {
                     bool success = await provider.completeQuest(quest.id);
                     if (success && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.green,
-                          content: Text('Quest Selesai! Reward +${quest.xpReward} XP diperoleh!'),
-                        ),
+                      QuestLogToast.showSuccess(
+                        context,
+                        'Quest Selesai! Reward +${quest.xpReward} XP diperoleh!',
                       );
                     }
                   },

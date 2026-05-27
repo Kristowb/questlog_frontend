@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
+import '../services/toast_service.dart';
 
 class DietScreen extends StatefulWidget {
   const DietScreen({super.key});
@@ -218,13 +219,12 @@ class _DietScreenState extends State<DietScreen> {
                                 _carbsController.clear();
                                 _fatController.clear();
                                 _caloriesController.clear();
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Color(0xFF00D4B2),
-                                    content: Text('Log Makanan Disimpan! (+10 Vitality XP)'),
-                                  ),
-                                );
+                                if (context.mounted) {
+                                  QuestLogToast.showSuccess(
+                                    context,
+                                    'Log Makanan Disimpan! (+10 Vitality XP)',
+                                  );
+                                }
                               }
                             }
                           },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
+import '../services/toast_service.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
@@ -136,13 +137,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                                 _setsController.clear();
                                 _repsController.clear();
                                 _weightController.clear();
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Color(0xFFE94057),
-                                    content: Text('Log Latihan Disimpan! (+10 Strength XP)'),
-                                  ),
-                                );
+                                if (context.mounted) {
+                                  QuestLogToast.showSuccess(
+                                    context,
+                                    'Log Latihan Disimpan! (+10 Strength XP)',
+                                  );
+                                }
                               }
                             }
                           },

@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../config/app_config.dart';
 import '../providers/questlog_provider.dart';
+import '../services/toast_service.dart';
 import 'class_selection_screen.dart';
 import 'home_screen.dart';
 
@@ -146,20 +147,15 @@ class LoginScreen extends StatelessWidget {
                                         _handleLoginSuccess(context, provider);
                                       }
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Gagal mendapatkan ID Token Google.')),
-                                      );
+                                        QuestLogToast.showError(context, 'Gagal mendapatkan ID Token Google.');
                                       }
                                     }
                                   }
                                 } catch (e) {
                                   debugPrint('Google Sign-In Error: $e');
-                                  if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Google SDK Gagal: $e'),
-                                    ),
-                                  );
+                                  if (context.mounted) {
+                                    QuestLogToast.showError(context, 'Google SDK Gagal: $e');
+                                  }
                                 }
                               },
                         child: provider.isLoading
@@ -179,9 +175,7 @@ class LoginScreen extends StatelessWidget {
                       _buildSocialCard(
                         context: context,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Masuk via Facebook segera hadir!')),
-                          );
+                          QuestLogToast.showWarning(context, 'Masuk via Facebook segera hadir!');
                         },
                         child: const Icon(
                           Icons.facebook,
@@ -195,9 +189,7 @@ class LoginScreen extends StatelessWidget {
                       _buildSocialCard(
                         context: context,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Masuk via Twitter/X segera hadir!')),
-                          );
+                          QuestLogToast.showWarning(context, 'Masuk via Twitter/X segera hadir!');
                         },
                         child: const TwitterXLogo(size: 24),
                       ),

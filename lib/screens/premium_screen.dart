@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/questlog_provider.dart';
+import '../services/toast_service.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -176,7 +177,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         ? null
                         : () async {
                             debugPrint('[PremiumScreen] Tombol "Aktifkan Pro Adventurer" diklik. Memulai proses pembayaran...');
-                            final scaffoldMessenger = ScaffoldMessenger.of(context);
                             bool success = await provider.buyPremium();
                             if (!context.mounted) {
                               debugPrint('[PremiumScreen] Konteks widget sudah tidak aktif (unmounted) setelah buyPremium().');
@@ -184,19 +184,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             }
                             if (success) {
                               debugPrint('[PremiumScreen] Pembayaran berhasil diproses dan dikonfirmasi!');
-                              scaffoldMessenger.showSnackBar(
-                                const SnackBar(
-                                  backgroundColor: Colors.green,
-                                  content: Text('Selamat! Akun Anda sekarang menjadi Premium Adventurer.'),
-                                ),
+                              QuestLogToast.showSuccess(
+                                context,
+                                'Selamat! Akun Anda sekarang menjadi Premium Adventurer.',
                               );
                             } else if (provider.errorMessage != null) {
                               debugPrint('[PremiumScreen] Pembayaran gagal. Pesan error: ${provider.errorMessage}');
-                              scaffoldMessenger.showSnackBar(
-                                SnackBar(
-                                  backgroundColor: Colors.red,
-                                  content: Text(provider.errorMessage!),
-                                ),
+                              QuestLogToast.showError(
+                                context,
+                                provider.errorMessage!,
                               );
                             } else {
                               debugPrint('[PremiumScreen] Pembayaran gagal tanpa pesan error spesifik.');
