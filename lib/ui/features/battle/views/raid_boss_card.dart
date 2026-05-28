@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../models/daily_boss.dart';
 import '../../../../providers/questlog_provider.dart';
 import '../../../../services/toast_service.dart';
+import 'raid_boss_codex_dialog.dart';
 
 class RaidBossCard extends StatelessWidget {
   final DailyBoss boss;
@@ -70,6 +71,20 @@ class RaidBossCard extends StatelessWidget {
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const RaidBossCodexDialog(),
+                      );
+                    },
+                    child: Icon(
+                      Icons.help_outline,
+                      color: boss.isDefeated ? Colors.amber.withValues(alpha: 0.7) : themeColor.withValues(alpha: 0.7),
+                      size: 14,
                     ),
                   ),
                 ],
