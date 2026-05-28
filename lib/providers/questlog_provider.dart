@@ -6,6 +6,7 @@ import '../models/quest.dart';
 import '../models/workout_log.dart';
 import '../models/diet_log.dart';
 import '../models/achievement.dart';
+import '../models/daily_boss.dart';
 import '../services/api_client.dart';
 
 class QuestLogProvider with ChangeNotifier {
@@ -19,6 +20,7 @@ class QuestLogProvider with ChangeNotifier {
   List<DietLog> _dailyDiet = [];
   List<User> _leaderboard = [];
   List<Achievement> _achievements = [];
+  DailyBoss? _activeBoss;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -34,6 +36,7 @@ class QuestLogProvider with ChangeNotifier {
   List<DietLog> get dailyDiet => _dailyDiet;
   List<User> get leaderboard => _leaderboard;
   List<Achievement> get achievements => _achievements;
+  DailyBoss? get activeBoss => _activeBoss;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -193,6 +196,7 @@ class QuestLogProvider with ChangeNotifier {
         await fetchDailyWorkouts();
         await fetchDailyQuests(); // Update status quest jika ada kecocokan
         await fetchAchievements(); // Refresh pencapaian jika terbuka
+        await fetchActiveBoss(); // Perbarui status boss setelah workout
         _setLoading(false);
         return true;
       }
@@ -376,6 +380,44 @@ class QuestLogProvider with ChangeNotifier {
     await fetchDailyDiet();
     await fetchLeaderboard();
     await fetchAchievements();
+    await fetchActiveBoss();
+  }
+
+  // Fetch Daily Active Boss
+  Future<void> fetchActiveBoss() async {
+    if (_currentUser == null) return;
+    try {
+      final response = await _apiClient.dio.get(
+        '/boss/active/${_currentUser!.id}',
+      );
+      if (response.statusCode == 200) {
+        _activeBoss = DailyBoss.fromJson(response.data);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Gagal mengambil status Raid Boss harian: $e');
+    }
+  }
+
+  // Claim Daily Boss Defeat Reward
+  Future<bool> claimBossReward() async {
+    if (_currentUser == null) return false;
+    _setLoading(true);
+    try {
+      final response = await _apiClient.dio.post(
+        '/boss/claim-reward/${_currentUser!.id}',
+      );
+      if (response.statusCode == 200) {
+        await refreshProfile();
+        await fetchActiveBoss();
+        _setLoading(false);
+        return true;
+      }
+    } catch (e) {
+      _errorMessage = 'Gagal mengklaim hadiah kemenangan bos harian: $e';
+    }
+    _setLoading(false);
+    return false;
   }
 
   // Logout
@@ -387,6 +429,7 @@ class QuestLogProvider with ChangeNotifier {
     _dailyWorkouts = [];
     _dailyDiet = [];
     _achievements = [];
+    _activeBoss = null;
     notifyListeners();
   }
 }

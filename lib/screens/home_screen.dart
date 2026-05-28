@@ -12,6 +12,7 @@ import 'leaderboard_screen.dart';
 import 'premium_screen.dart';
 import 'login_screen.dart';
 import 'achievements_screen.dart';
+import '../ui/features/battle/views/raid_boss_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -363,6 +364,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ).animate().fade(duration: 400.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
           const SizedBox(height: 28),
+
+          // Raid Boss Harian Card
+          if (provider.activeBoss != null) ...[
+            RaidBossCard(boss: provider.activeBoss!)
+                .animate()
+                .fade(duration: 400.ms, delay: 50.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+            const SizedBox(height: 28),
+          ],
 
           // 2. Nutrisi Makro (Diet Meat-Heavy)
           const Text(
