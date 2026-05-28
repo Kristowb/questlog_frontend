@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/questlog_provider.dart';
-import 'screens/login_screen.dart';
+import 'screens/onboarding_screen.dart';
 
 void main() {
   runApp(
@@ -37,7 +37,7 @@ class QuestLogApp extends StatelessWidget {
           bodyMedium: TextStyle(fontFamily: 'Inter'),
         ),
       ),
-      home: const LoginScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }
